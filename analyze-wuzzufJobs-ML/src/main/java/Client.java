@@ -12,5 +12,7 @@ public class Client {
         db.barChart("Title");
         db.mostDemanding("Location");
         db.barChart("Location");
+        db.printSkills("Skills");
+        db.mostImportantSkills("Skills");
     }
 }

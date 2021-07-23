@@ -2,6 +2,7 @@ import org.knowm.xchart.*;
 import org.knowm.xchart.style.Styler;
 import tech.tablesaw.aggregate.Summarizer;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 
 import java.io.IOException;
 import java.util.*;
@@ -59,6 +60,47 @@ public class Database {
                     + ": " + val.getValue());
         }
     }
+    //  Qustion - 10 (print skills and how many each repeated)
+    public Map<String, Integer> skills (String col_name){
+        List<String> skillsList = this.t.stringColumn(col_name).asList();
+        List<String> items_skillsList = Arrays.asList(skillsList.toString().split(","));  //make split because column of skills contain multi skills in one cell
+        Set<String> skills = new HashSet<>(items_skillsList);
+
+        Map<String,Integer> map= new HashMap<String, Integer>();
+        for (String Sk: skills){map.put(Sk, Collections.frequency(items_skillsList, Sk));}
+
+        return map;
+       }
+    public void printSkills(String col_name) {
+        Map<String, Integer> map = skills(col_name);
+        for (Map.Entry<String, Integer> val : map.entrySet()) {
+            System.out.println(val.getKey() + " "
+                    + ": " + val.getValue());
+        }
+    }
+
+        //sorted the output from skills to find out the most important skills required
+    public void mostImportantSkills(String col_name){
+        Map<String,Integer> map = skills(col_name);
+        System.out.println("Most Important Skills");
+        LinkedHashMap<String, Integer> sortedMap =
+                map.entrySet().stream().
+                        sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).limit(10).
+                        collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                                (e1, e2) -> e1, LinkedHashMap::new));
+        for (Map.Entry<String, Integer> val : sortedMap.entrySet()) {
+            System.out.println(val.getKey() + " "
+                    + ": " + val.getValue());
+        }
+
+   }
+
+   // Question 11 (Factorize the yearsExp feature and convert it to numbers in new col
+   // Question 12 (Apply k-means for job title and companies
+   public void kmnn(String col){
+       List<String> skillsList = this.t.stringColumn(col).asList();
+   }
+
         public void pieChart_for_Companies() {
             HashMap<String, Integer> map =jobsmap("Company");
 
