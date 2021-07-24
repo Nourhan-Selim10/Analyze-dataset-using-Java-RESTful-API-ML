@@ -1,6 +1,8 @@
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.Styler;
 import tech.tablesaw.aggregate.Summarizer;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 
@@ -96,10 +98,30 @@ public class Database {
    }
 
    // Question 11 (Factorize the yearsExp feature and convert it to numbers in new col
-   // Question 12 (Apply k-means for job title and companies
-   public void kmnn(String col){
-       List<String> skillsList = this.t.stringColumn(col).asList();
-   }
+
+    public void factorizeYears(){
+        Map<Integer,Integer> yearsMap  =new HashMap<Integer,Integer>();
+        StringColumn yearsExp = (StringColumn) this.t.column ("YearsExp");
+        List<Number > yearValues = new ArrayList<Number> ();
+        Integer index = 0;
+
+        for (String v : yearsExp) {
+            Integer temp = null;
+            if (v.replaceAll("[^0-9]", "").equals("")){
+                temp =0;
+            }else{ temp = Integer.parseInt(v.replaceAll("[^0-9]", "")); }
+            if (yearsMap.containsKey(temp)==false){
+                yearsMap.put(temp,index);
+                yearValues.add(index);
+                index +=1;
+            }
+            else{ yearValues.add(yearsMap.get(temp)); }
+        }
+        DoubleColumn yearsColumn = DoubleColumn.create("factorized years", yearValues);
+        this.t.addColumns (yearsColumn);
+    }
+
+
 
         public void pieChart_for_Companies() {
             HashMap<String, Integer> map =jobsmap("Company");

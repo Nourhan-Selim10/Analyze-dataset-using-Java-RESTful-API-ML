@@ -14,5 +14,7 @@ public class Client {
         db.barChart("Location");
         db.printSkills("Skills");
         db.mostImportantSkills("Skills");
+        db.factorizeYears();
+        System.out.println(db.t.first(10)); // to show the factorized years column
     }
 }
