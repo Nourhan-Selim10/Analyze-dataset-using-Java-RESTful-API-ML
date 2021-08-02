@@ -1,12 +1,18 @@
+import com.univocity.parsers.csv.CsvFormat;
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.Styler;
+import smile.data.measure.NominalScale;
+import smile.data.vector.IntVector;
 import tech.tablesaw.aggregate.Summarizer;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
+import org.apache.commons.csv.CSVFormat;
+import smile.io.Read;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +68,48 @@ public class Database {
                     + ": " + val.getValue());
         }
     }
+
+    public smile.data.DataFrame ReadASSmileDateFrame(String CSVFile)
+    {
+
+        CSVFormat format = CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(',');
+        smile.data.DataFrame dfSmile = null;
+
+        try
+        {dfSmile = Read.csv(CSVFile,format);}
+
+        catch (IOException | URISyntaxException e)
+        {e.printStackTrace();}
+
+        return dfSmile;
+    }
+
+
+    public int[] ColFactorize(smile.data.DataFrame df, String col_name)
+    {
+        String[] values = df.stringVector(col_name).distinct().toArray(new String[]{});
+        return df.stringVector(col_name).factorize(new NominalScale(values)).toIntArray();
+    }
+
+
+    public smile.data.DataFrame FactorizeData(smile.data.DataFrame df)
+    {
+        df = df.merge(IntVector.of("JobsFactorize", ColFactorize(df, "Title")));
+        df = df.merge(IntVector.of("CompanyFactorize", ColFactorize(df, "Company")));
+        return df;
+    }
+
+
+    public double[][] KmeanGraph(smile.data.DataFrame df)
+    {
+        df = FactorizeData(df);
+        smile.data.DataFrame kmean = df.select("CompanyFactorize", "JobsFactorize");
+
+        double[][] KMEAN= kmean.toArray();
+        return KMEAN;
+
+    }
+
     //  Qustion - 10 (print skills and how many each repeated)
     public Map<String, Integer> skills (String col_name){
         List<String> skillsList = this.t.stringColumn(col_name).asList();
